@@ -6,7 +6,8 @@ import csv
 import os
 from rich.console import Console
 from rich.table import Table
-
+from rich.spinner import Spinner
+from rich.live import Live
 
 def get_tts(voice, text, output_fmt="wav", output_file=None): 
 
@@ -25,7 +26,8 @@ def get_tts(voice, text, output_fmt="wav", output_file=None):
         'fmt': output_fmt 
     }
 
-    response = requests.get(url, headers=headers, params=params)
+    with Live(Spinner("dots", text="Fetching audio...", style="bold green"), console=console, auto_refresh=True):
+        response = requests.get(url, headers=headers, params=params)
 
     if response.status_code != 200:
         console.print(f"Error: {response.status_code}")
@@ -41,9 +43,6 @@ def get_tts(voice, text, output_fmt="wav", output_file=None):
     else:
         console.print(f"Error: {response.status_code}")
 
-    # log_request(output_file, voice, text)
-    # subprocess.run(['mpv', f"audio/{output_file}"])
-    
 
 def get_or_print_voices(voice):
     console = Console()

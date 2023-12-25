@@ -6,8 +6,7 @@ from rich.console import Console
 from rich.markdown import Markdown
 
 
-
-def send_completion(prompt, instructions="", model="Neets-7B", max_tokens=500):
+def get_completion(prompt, instructions="", model="Neets-7B", max_tokens=500):
 
     console = Console()
 

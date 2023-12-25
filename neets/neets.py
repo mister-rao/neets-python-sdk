@@ -1,7 +1,8 @@
 import click
-from rich.console import Console
-from neets.completions import send_completion 
-from neets.tts import get_tts, get_or_print_voices
+
+from neets.completions import get_completion 
+from neets.tts import get_tts, get_or_print_voices, print_voices
+from neets.utils import check_api_key
 
 NEETS_API_CLI_VERSION = "0.0.1"
 
@@ -17,18 +18,32 @@ def cli():
 @click.option('--model', '-m', help='The model to use for the completion.', default="Neets-7B")
 @click.option('--max-tokens', '-mt', help='The maximum number of tokens to generate.', default=500)  
 def chat(prompt, instructions, model, max_tokens):
-    send_completion(prompt, instructions, model, max_tokens)
+
+    has_api_key = check_api_key()
+    if not has_api_key:
+        return
+
+    get_completion(prompt, instructions, model, max_tokens)
 
 
 @cli.command(help="Convert text to speech using a voice from the neets.ai API.")
 @click.option('--voice', '-v', help='The voice to use for the tts.', required=True)
 @click.option('--text', '-t', help='The text to use for the tts.', required=True)
-@click.option('--output-fmt', '-o', help='The output format for the tts.', default="wav")
-@click.option('--output-file', '-f', help='The output file for the tts.', default=None)
-def tts(voice, text, output_fmt="wav", output_file=None):
+@click.option('--output-fmt', '-f', help='The output format for the tts.', default="wav")
+@click.option('--output-file', '-o', help='The output file for the tts.', default=None)
+def tts(voice, text, output_fmt, output_file):
+
+    has_api_key = check_api_key()
+    if not has_api_key:
+        return
 
     voice = get_or_print_voices(voice)
     if voice == None:
         return
     
     get_tts(voice, text, output_fmt, output_file)
+
+
+@cli.command(help="Print a list of available voices from the neets.ai API.")
+def voices():
+    print_voices()
