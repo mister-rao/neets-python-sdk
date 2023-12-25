@@ -7,7 +7,7 @@ from rich.markdown import Markdown
 
 
 
-def send_request(prompt, instructions="", model="Neets-7B", max_tokens=500):
+def send_completion(prompt, instructions="", model="Neets-7B", max_tokens=500):
 
     console = Console()
 
