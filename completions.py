@@ -11,11 +11,20 @@ from dotenv import load_dotenv
 
 def main():
     load_dotenv()
+    
     prompt = sys.argv[1]
-    send_request(prompt)
 
-def send_request(prompt):
-    print(prompt)
+    if len(sys.argv) > 2:
+        instructions = sys.argv[2]
+    else:
+        instructions = " "
+
+    send_request(prompt, instructions)
+
+def send_request(prompt, instructions):
+
+    console = Console()
+
     url = "https://api.neets.ai/v1/chat/completions"
 
     api_key = os.getenv('NEETS_API')
@@ -24,18 +33,15 @@ def send_request(prompt):
         'Content-Type': 'application/json'
     }
 
+    # models: mistralai/Mixtral-8X7B-Instruct-v0.1, Neets-7B
+
     data = {
         "messages": [
-            # {
-            #     "content": "You are to answer all questions in as if you were an expert programmer",
-            #     "role": "assistant"
-            # },
             {
-                "content": f"{prompt}",
+                "content": f"{instructions}: {prompt}",
                 "role": "user"
             }
         ],
-        # "model": "mistralai/Mixtral-8X7B-Instruct-v0.1",
         "model": "Neets-7B",
         "frequency_penalty": 0,
         "max_tokens": 500,
@@ -53,13 +59,13 @@ def send_request(prompt):
 
     response = requests.post(url, json=data, headers=headers)
 
-    if response.text:  # Check if the response is not empty
+    print(response.status_code)
+
+    if response.text:  
         res = response.json()
     else:
-        print("Empty response received")
+        console.print("Empty response received")
         res = None
-
-    console = Console()
 
     console.print(Markdown(res['choices'][0]['message']['content']))
 
