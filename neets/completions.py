@@ -1,7 +1,6 @@
 import requests
-import datetime
 import os 
-import csv
+
 from rich.console import Console
 from rich.markdown import Markdown
 
@@ -56,16 +55,5 @@ def get_completion(prompt, instructions="", model="Neets-7B", max_tokens=500):
 
     res_str = res['choices'][0]['message']['content']
     console.print(Markdown(res_str))
-
-    # prompt_res_logger(prompt, res)
-
-def prompt_res_logger(prompt, res):
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
-    
-    with open('logs/prompt_res.csv', 'a') as file:
-        writer = csv.writer(file)
-        model_res = res['choices'][0]['message']['content'].strip("\n")
-        writer.writerow([datetime.datetime.now(), prompt, model_res, res])
 
 

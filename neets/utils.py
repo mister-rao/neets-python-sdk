@@ -1,4 +1,6 @@
 import os
+import datetime
+import csv
 from rich.console import Console
 
 def check_api_key():
@@ -12,3 +14,26 @@ def check_api_key():
         return False
 
     return True
+
+
+def log_tts(output_file, voice, text):
+    text = text.replace('\n', ' ')
+
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+
+    with open('logs/tts_log.csv', 'a') as file:
+        writer = csv.writer(file)
+        writer.writerow([output_file, datetime.datetime.now(), voice, text])
+
+
+
+def prompt_res_logger(prompt, res):
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+    
+    with open('logs/prompt_res.csv', 'a') as file:
+        writer = csv.writer(file)
+        model_res = res['choices'][0]['message']['content'].strip("\n")
+        writer.writerow([datetime.datetime.now(), prompt, model_res, res])
+

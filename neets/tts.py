@@ -1,9 +1,6 @@
 import requests
 import os
 import uuid
-import datetime
-import csv
-import os
 from rich.console import Console
 from rich.table import Table
 from rich.spinner import Spinner
@@ -34,7 +31,7 @@ def get_tts(voice, text, output_fmt="wav", output_file=None):
         return None
 
     if output_file == None:
-        output_file = f'{voice}_{str(uuid.uuid1())}.wav'
+        output_file = f'{voice}_{str(uuid.uuid1())}.{output_fmt}'
 
     if response.status_code == 200:
         with open(f"{output_file}", 'wb') as file:
@@ -96,15 +93,3 @@ def get_voices():
         'warren-buffett', 'taylor-swift'
     ]
     return voices
-
-
-
-def log_request(output_file, voice, text):
-    text = text.replace('\n', ' ')
-
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
-
-    with open('logs/tts_log.csv', 'a') as file:
-        writer = csv.writer(file)
-        writer.writerow([output_file, datetime.datetime.now(), voice, text])
