@@ -1,6 +1,7 @@
 import requests
 import os
 import uuid
+from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 from rich.spinner import Spinner
@@ -9,6 +10,23 @@ from rich.live import Live
 def get_tts(voice, text, output_fmt="wav", output_file=None): 
 
     console = Console()
+
+    if output_file == None:
+        output_file = f'{voice}_{str(uuid.uuid1())}.{output_fmt}'
+    else:
+        ext = Path(output_file).suffix
+        base_name = Path(output_file).stem
+
+        if ext not in ['.wav', '.mp3']: 
+            console.print(f"[red]Error:[/red] Invalid output file extension: {base_name}[bold][green]{ext}[/green][/bold] (must be .wav or .mp3)")
+            return None
+
+        if output_fmt != ext[1:]:
+            console.print(f"[red]Error:[/red] Output file extension {base_name}[bold][green]{ext}[/green][/bold] does not match output format: [bold][green].{output_fmt}[/green][/bold] (must be .{output_fmt})")
+            return None
+
+
+
     url = "https://api.neets.ai/v1/tts"
 
     api_key = os.getenv('NEETS_API_KEY')
@@ -30,8 +48,6 @@ def get_tts(voice, text, output_fmt="wav", output_file=None):
         console.print(f"Error: {response.status_code}")
         return None
 
-    if output_file == None:
-        output_file = f'{voice}_{str(uuid.uuid1())}.{output_fmt}'
 
     if response.status_code == 200:
         with open(f"{output_file}", 'wb') as file:
