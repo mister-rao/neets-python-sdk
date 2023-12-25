@@ -3,9 +3,10 @@ import os
 
 from rich.console import Console
 from rich.markdown import Markdown
+from rich.spinner import Spinner
+from rich.live import Live
 
-
-def get_completion(prompt, instructions="", model="Neets-7B", max_tokens=500):
+def get_completion(prompt, model="Neets-7B", max_tokens=500, quiet=False):
 
     console = Console()
 
@@ -22,18 +23,18 @@ def get_completion(prompt, instructions="", model="Neets-7B", max_tokens=500):
     data = {
         "messages": [
             {
-                "content": f"{instructions}: {prompt}",
+                "content": f"{prompt}",
                 "role": "user"
             }
         ],
-        "model": model, 
-        "frequency_penalty": 0,
-        "max_tokens": max_tokens,
-        "n": 1,
-        "presence_penalty": 0,
         "response_format": {
             "type": "json_object"
         },
+        "model": model, 
+        "max_tokens": max_tokens,
+        "frequency_penalty": 0,
+        "n": 1,
+        "presence_penalty": 0,
         "seed": -9223372036854776000,
         "stop": "null",
         "stream": "false",
@@ -41,7 +42,12 @@ def get_completion(prompt, instructions="", model="Neets-7B", max_tokens=500):
         "top_p": 1
         }
 
-    response = requests.post(url, json=data, headers=headers)
+    if not quiet:
+        with Live(Spinner("simpleDots", style="bold green"), console=console, auto_refresh=True):
+            response = requests.post(url, json=data, headers=headers)
+    else:
+        response = requests.post(url, json=data, headers=headers)
+
 
     if response.status_code != 200:
         console.print(f"Error: {response.status_code}")

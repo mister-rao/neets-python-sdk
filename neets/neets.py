@@ -4,7 +4,7 @@ from neets.completions import get_completion
 from neets.tts import get_tts, get_or_print_voices, print_voices
 from neets.utils import check_api_key
 
-NEETS_API_CLI_VERSION = "0.0.3"
+NEETS_API_CLI_VERSION = "0.0.4"
 
 @click.group()
 @click.version_option(NEETS_API_CLI_VERSION, message='Neets api cli version: %(version)s')
@@ -14,16 +14,16 @@ def cli():
 
 @cli.command(help="Send a prompt to the neets.ai API and print a completion.") 
 @click.option('--prompt', '-p', help='The prompt to use for the model.', required=True)
-@click.option('--instructions', '-i', help='The instructions to use for the model.', default="")
 @click.option('--model', '-m', help='The model to use for the completion.', default="Neets-7B")
 @click.option('--max-tokens', '-mt', help='The maximum number of tokens to generate.', default=500)  
-def chat(prompt, instructions, model, max_tokens):
+@click.option('--quiet', '-q', help="Don't show progress spinner", is_flag=True)
+def chat(prompt, model, max_tokens, quiet):
 
     has_api_key = check_api_key()
     if not has_api_key:
         return
 
-    get_completion(prompt, instructions, model, max_tokens)
+    get_completion(prompt, model, max_tokens, quiet)
 
 
 @cli.command(help="Convert text to speech using a voice from the neets.ai API.")
