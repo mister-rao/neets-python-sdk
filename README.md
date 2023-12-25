@@ -2,10 +2,13 @@
 CLI to interact with the [neets.ai](https://neets.ai/) Text To Speech 
 and completions API. 
 
+## Installation
 
-## Configuration
-
+```bash
+pip install neets
+```
 A neets.ai API key must be set as an environment variable. 
+
 ```bash
 export NEETS_API_KEY=<your api key>
 ```

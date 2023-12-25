@@ -4,7 +4,7 @@ from neets.completions import get_completion
 from neets.tts import get_tts, get_or_print_voices, print_voices
 from neets.utils import check_api_key
 
-NEETS_API_CLI_VERSION = "0.0.1"
+NEETS_API_CLI_VERSION = "0.0.3"
 
 @click.group()
 @click.version_option(NEETS_API_CLI_VERSION, message='Neets api cli version: %(version)s')
