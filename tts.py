@@ -5,6 +5,7 @@ import uuid
 import subprocess
 import datetime
 import csv
+import os
 from dotenv import load_dotenv
 
 
@@ -23,6 +24,7 @@ def send_request(voice, text):
 
     api_key = os.getenv('NEETS_API')
     headers = {
+        "Authorization": "Bearer " + api_key, 
         'X-API-Key': api_key
     }
     params = {
@@ -67,7 +69,11 @@ def get_or_print_voices(voice):
 
 def log_request(output_file, voice, text):
     text = text.replace('\n', ' ')
-    with open('log.csv', 'a') as file:
+
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+
+    with open('logs/tts_log.csv', 'a') as file:
         writer = csv.writer(file)
         writer.writerow([output_file, datetime.datetime.now(), voice, text])
 

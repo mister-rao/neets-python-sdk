@@ -6,34 +6,35 @@ import datetime
 from rich.console import Console
 from rich.markdown import Markdown
 from dotenv import load_dotenv
+import os
 
 
 
 def main():
-    load_dotenv()
-    
+
     prompt = sys.argv[1]
 
     if len(sys.argv) > 2:
         instructions = sys.argv[2]
     else:
-        instructions = " "
+        instructions = ""
 
     send_request(prompt, instructions)
 
 def send_request(prompt, instructions):
 
+    load_dotenv()
     console = Console()
 
     url = "https://api.neets.ai/v1/chat/completions"
 
     api_key = os.getenv('NEETS_API')
+
     headers = {
         'X-API-Key': api_key, 
+        "Authorization": "Bearer " + api_key, 
         'Content-Type': 'application/json'
     }
-
-    # models: mistralai/Mixtral-8X7B-Instruct-v0.1, Neets-7B
 
     data = {
         "messages": [
@@ -42,7 +43,7 @@ def send_request(prompt, instructions):
                 "role": "user"
             }
         ],
-        "model": "Neets-7B",
+        "model": "mistralai/Mixtral-8X7B-Instruct-v0.1", # Neets-7B
         "frequency_penalty": 0,
         "max_tokens": 500,
         "n": 1,
@@ -59,7 +60,9 @@ def send_request(prompt, instructions):
 
     response = requests.post(url, json=data, headers=headers)
 
-    print(response.status_code)
+    if response.status_code != 200:
+        console.print(f"Error: {response.status_code}")
+        return None
 
     if response.text:  
         res = response.json()
@@ -67,12 +70,18 @@ def send_request(prompt, instructions):
         console.print("Empty response received")
         res = None
 
-    console.print(Markdown(res['choices'][0]['message']['content']))
+    res_str = res['choices'][0]['message']['content']
+    console.print(Markdown(res_str))
+    prompt_res_logger(prompt, res)
 
 def prompt_res_logger(prompt, res):
-    with open('prompt_res.csv', 'a') as file:
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+    
+    with open('logs/prompt_res.csv', 'a') as file:
         writer = csv.writer(file)
-        writer.writerow([datetime.datetime.now(), prompt, res])
+        model_res = res['choices'][0]['message']['content'].strip("\n")
+        writer.writerow([datetime.datetime.now(), prompt, model_res, res])
 
 
 if __name__ == '__main__':
