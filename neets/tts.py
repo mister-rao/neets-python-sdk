@@ -32,7 +32,6 @@ def get_tts(voice, text, output_fmt="wav", output_file=None):
     api_key = os.getenv('NEETS_API_KEY')
 
     headers = {
-        "Authorization": "Bearer " + api_key, 
         'X-API-Key': api_key
     }
     params = {
